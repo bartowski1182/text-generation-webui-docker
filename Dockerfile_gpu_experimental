@@ -1,0 +1,71 @@
+# Use nvidia/cuda as a builder base
+FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 as builder
+
+COPY --from=continuumio/miniconda3:4.12.0 /opt/conda /opt/conda
+
+ENV PATH=/opt/conda/bin:$PATH
+
+# Update the base image
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get install -y git build-essential \
+    ocl-icd-opencl-dev opencl-headers clinfo \
+    wget \
+    && mkdir -p /etc/OpenCL/vendors && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
+
+# Create a new environment
+RUN conda create -y -n textgen python=3.10.9
+SHELL ["conda", "run", "-n", "textgen", "/bin/bash", "-c"]
+
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+RUN git clone https://github.com/oobabooga/text-generation-webui \
+    && cd text-generation-webui && git checkout 37a16d23a784aea52f2ce9559793dd136e051148 && pip3 install -r requirements.txt
+
+RUN pip3 install ninja
+
+RUN pip3 uninstall -y llama-cpp-python \
+    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.66 --no-cache-dir
+
+RUN git clone https://github.com/TimDettmers/bitsandbytes.git --branch 0.39.1 \
+    && cd bitsandbytes \
+    && CUDA_VERSION=118 make cuda11x \
+    && python3 setup.py install
+
+RUN mkdir -p text-generation-webui/repositories/ && cd text-generation-webui/repositories/ \
+    && git clone https://github.com/turboderp/exllama && cd exllama && git checkout 93d50d1cebf7105cba56f89fa057397e95d60572
+
+RUN cd text-generation-webui/repositories/ && git clone https://github.com/oobabooga/GPTQ-for-LLaMa.git -b cuda
+
+RUN pip3 install https://github.com/jllllll/GPTQ-for-LLaMa-Wheels/raw/Linux-x64/quant_cuda-0.0.0-cp310-cp310-linux_x86_64.whl
+
+RUN conda clean -afy
+
+# Now use a smaller image for the final step
+FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+
+COPY --from=builder /opt/conda /opt/conda
+COPY --from=builder /usr/local/cuda-11.8/targets/x86_64-linux/include /usr/local/cuda-11.8/targets/x86_64-linux/include 
+
+ENV PATH=/opt/conda/bin:$PATH
+
+COPY --from=builder /text-generation-webui /text-generation-webui
+
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get -y install python3 build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
+    && mkdir -p /etc/OpenCL/vendors
+
+COPY --from=builder /etc/OpenCL/vendors/nvidia.icd /etc/OpenCL/vendors/nvidia.icd
+
+# Set the working directory
+WORKDIR /text-generation-webui
+
+EXPOSE 7860
+EXPOSE 5000
+
+# Make the script executable
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Define the entrypoint
+ENTRYPOINT ["/start.sh"]
