@@ -1,4 +1,4 @@
-# text-generaion-webui-docker
+# text-generation-webui-docker
 
 Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.2 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.2
 
