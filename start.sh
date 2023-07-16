@@ -3,7 +3,7 @@
 # Remove the models directory and create a symbolic link
 
 if [[ -d /models ]] ; then
-    cp /text-generation-webui/models/config.yaml /models
+    cp -R /text-generation-webui/models/config.yaml /models
     rm -r /text-generation-webui/models
     ln -s /models /text-generation-webui/models
 else
@@ -26,7 +26,7 @@ else
 fi
 
 if [[ -d /presets ]] ; then
-    cp /text-generation-webui/presets/. /presets
+    cp -R /text-generation-webui/presets/. /presets
     rm -r /text-generation-webui/presets
     ln -s /presets /text-generation-webui/loras
 else
@@ -40,8 +40,6 @@ if [[ -d /characters ]] ; then
 else
     echo "No characters DIR"
 fi
-
-
 
 # Start the server
 conda run --no-capture-output -n textgen python server.py "$@"

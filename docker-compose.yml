@@ -1,0 +1,37 @@
+version: '3.9'
+services:
+  text-generation-webui:
+    container_name: text-generation-webui
+    restart: always
+    volumes:
+      - '${MODEL_DIR}:/models'
+    ports:
+      - '7860:7860'
+      - '5000:5000'
+      - '5001:5001'
+    image: 'noneabove1182/text-gen-ui-gpu:latest'
+    ulimits:
+      memlock: -1
+    mem_limit: 50gb
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    command:
+      [
+        "--model",
+        "${MODEL}",
+        "--chat",
+        "--no-stream",
+        "--listen",
+        "--listen-port",
+        "7860",
+        "--api",
+        "--api-blocking-port",
+        "5000",
+        "--extensions",
+        "openai"
+      ]

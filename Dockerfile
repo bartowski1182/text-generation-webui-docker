@@ -17,29 +17,22 @@ SHELL ["conda", "run", "-n", "textgen", "/bin/bash", "-c"]
 
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-RUN git clone https://github.com/oobabooga/text-generation-webui \
-    && cd text-generation-webui && git checkout 3c076c3c8096fa83440d701ba4d7d49606aaf61f && pip3 install -r requirements.txt
+RUN pip3 install ninja
+
+RUN pip3 uninstall -y llama-cpp-python \
+    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.72 --no-cache-dir
+
+RUN git clone https://github.com/TimDettmers/bitsandbytes.git \
+    && cd bitsandbytes && git checkout 37c25c1e0db6b61d9a55ff5d6879eb50a10326e7 \
+    && CUDA_VERSION=118 make cuda11x \
+    && python3 setup.py install
+
+RUN git clone https://github.com/oobabooga/text-generation-webui.git --branch v1.2 \
+    && cd text-generation-webui && pip3 install -r requirements.txt
 
 RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do pip3 install -r $i ; done'
 
 RUN python3 text-generation-webui/extensions/openai/cache_embedding_model.py
-
-RUN pip3 install ninja
-
-RUN pip3 uninstall -y llama-cpp-python \
-    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.66 --no-cache-dir
-
-RUN git clone https://github.com/TimDettmers/bitsandbytes.git --branch 0.39.1 \
-    && cd bitsandbytes \
-    && CUDA_VERSION=118 make cuda11x \
-    && python3 setup.py install
-
-RUN mkdir -p text-generation-webui/repositories/ && cd text-generation-webui/repositories/ \
-    && git clone https://github.com/turboderp/exllama && cd exllama && git checkout 93d50d1cebf7105cba56f89fa057397e95d60572
-
-RUN cd text-generation-webui/repositories/ && git clone https://github.com/oobabooga/GPTQ-for-LLaMa.git -b cuda
-
-RUN pip3 install https://github.com/jllllll/GPTQ-for-LLaMa-Wheels/raw/Linux-x64/quant_cuda-0.0.0-cp310-cp310-linux_x86_64.whl
 
 RUN conda clean -afy
 
