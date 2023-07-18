@@ -1,6 +1,6 @@
 # text-generation-webui-docker
 
-Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.2 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.2
+Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.3 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.3
 
 You can pass folders for models, loras, prompts, presets, and characters
 
