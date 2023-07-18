@@ -20,14 +20,11 @@ RUN pip3 install torch torchvision torchaudio --index-url https://download.pytor
 RUN pip3 install ninja
 
 RUN pip3 uninstall -y llama-cpp-python \
-    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.72 --no-cache-dir
+    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.73 --no-cache-dir
 
-RUN git clone https://github.com/TimDettmers/bitsandbytes.git \
-    && cd bitsandbytes && git checkout 37c25c1e0db6b61d9a55ff5d6879eb50a10326e7 \
-    && CUDA_VERSION=118 make cuda11x \
-    && python3 setup.py install
+#RUN pip3 install bitsandbytes==0.40.2
 
-RUN git clone https://github.com/oobabooga/text-generation-webui.git --branch v1.2 \
+RUN git clone https://github.com/oobabooga/text-generation-webui.git --branch v1.3 \
     && cd text-generation-webui && pip3 install -r requirements.txt
 
 RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do pip3 install -r $i ; done'
