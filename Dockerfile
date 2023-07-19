@@ -19,7 +19,7 @@ RUN pip3 install torch torchvision torchaudio --index-url https://download.pytor
 
 RUN pip3 install ninja
 
-RUN git clone https://github.com/oobabooga/text-generation-webui.git --branch v1.3 \
+RUN git clone https://github.com/oobabooga/text-generation-webui.git --branch v1.3.1 \
     && cd text-generation-webui && pip3 install -r requirements.txt
 
 RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do pip3 install -r $i ; done'
