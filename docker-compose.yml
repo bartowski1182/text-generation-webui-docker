@@ -33,5 +33,6 @@ services:
         "--api-blocking-port",
         "5000",
         "--extensions",
-        "openai"
+        "openai",
+        "--verbose"
       ]

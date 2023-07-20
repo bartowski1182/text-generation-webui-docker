@@ -6,7 +6,7 @@ COPY --from=continuumio/miniconda3:4.12.0 /opt/conda /opt/conda
 ENV PATH=/opt/conda/bin:$PATH
 
 # Update the base image
-RUN apt-mark hold cuda-keyring && apt-get update && apt-get upgrade -y \
+RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y git build-essential \
     ocl-icd-opencl-dev opencl-headers clinfo \
     && mkdir -p /etc/OpenCL/vendors && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
@@ -35,6 +35,11 @@ RUN pip3 uninstall -y bitsandbytes \
     && CUDA_VERSION=118 make cuda11x \
     && python3 setup.py install
 
+RUN pip3 uninstall -y exllama
+
+RUN mkdir -p text-generation-webui/repositories/ && cd text-generation-webui/repositories/ \
+    && git clone https://github.com/turboderp/exllama && cd exllama && git checkout 39b3541cdd86e9de2edcf29e93b0c255b6a3436d
+
 RUN conda clean -afy
 
 # Now use a smaller image for the final step
@@ -49,20 +54,14 @@ COPY --from=builder /text-generation-webui /text-generation-webui
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-mark hold cuda-keyring && apt-get update && apt-get upgrade -y \
-    && apt-get -y install python3 build-essential wget \
+RUN apt-get -y update && apt-get -y install wget && wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb \
+    && dpkg -i cuda-keyring_1.0-1_all.deb && apt-get update && apt-get upgrade -y \
+    && apt-get -y install python3 build-essential \
     && mkdir -p /etc/OpenCL/vendors \
     && apt-get -y install cuda-11.8 && apt-get -y install cuda-11.8 \
     && systemctl enable nvidia-persistenced \
     && cp /lib/udev/rules.d/40-vm-hotadd.rules /etc/udev/rules.d \
     && sed -i '/SUBSYSTEM=="memory", ACTION=="add"/d' /etc/udev/rules.d/40-vm-hotadd.rules
-
-# RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb \
-#     && dpkg -i cuda-keyring_1.0-1_all.deb \
-#     && apt-get update && apt-get -y install cuda && apt-get -y install cuda \
-#     && systemctl enable nvidia-persistenced \
-#     && cp /lib/udev/rules.d/40-vm-hotadd.rules /etc/udev/rules.d \
-#     && sed -i '/SUBSYSTEM=="memory", ACTION=="add"/d' /etc/udev/rules.d/40-vm-hotadd.rules
 
 COPY --from=builder /etc/OpenCL/vendors/nvidia.icd /etc/OpenCL/vendors/nvidia.icd
 
