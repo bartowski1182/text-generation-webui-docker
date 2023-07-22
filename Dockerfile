@@ -27,7 +27,7 @@ RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do p
 RUN python3 text-generation-webui/extensions/openai/cache_embedding_model.py
 
 RUN pip3 uninstall -y llama-cpp-python \
-    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.73 --no-cache-dir
+    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.74 --no-cache-dir
 
 RUN pip3 uninstall -y bitsandbytes \
     && git clone https://github.com/TimDettmers/bitsandbytes.git \
@@ -61,7 +61,8 @@ RUN apt-get -y update && apt-get -y install wget && wget https://developer.downl
     && apt-get -y install cuda-11.8 && apt-get -y install cuda-11.8 \
     && systemctl enable nvidia-persistenced \
     && cp /lib/udev/rules.d/40-vm-hotadd.rules /etc/udev/rules.d \
-    && sed -i '/SUBSYSTEM=="memory", ACTION=="add"/d' /etc/udev/rules.d/40-vm-hotadd.rules
+    && sed -i '/SUBSYSTEM=="memory", ACTION=="add"/d' /etc/udev/rules.d/40-vm-hotadd.rules \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY --from=builder /etc/OpenCL/vendors/nvidia.icd /etc/OpenCL/vendors/nvidia.icd
 
@@ -74,8 +75,6 @@ EXPOSE 5000
 # Make the script executable
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
-
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Define the entrypoint
 ENTRYPOINT ["/start.sh"]

@@ -1,6 +1,8 @@
 # text-generation-webui-docker
 
-Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.3 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.3
+Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.3.1 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.3.1
+
+July 22: Includes an update to the exllama module for running GQA (aka 70B version of Llama 2)
 
 You can pass folders for models, loras, prompts, presets, and characters
 
