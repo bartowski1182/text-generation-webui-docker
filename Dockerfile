@@ -21,7 +21,7 @@ RUN pip3 install torch torchvision torchaudio --index-url https://download.pytor
 RUN pip3 install ninja
 
 # Pulling latest text-generation-webui branch
-RUN git clone https://github.com/oobabooga/text-generation-webui.git --branch v1.3.1 \
+RUN git clone https://github.com/oobabooga/text-generation-webui.git --branch v1.5 \
     && cd text-generation-webui && pip3 install -r requirements.txt
 
 # Install all the extension requirements
@@ -32,18 +32,13 @@ RUN python3 text-generation-webui/extensions/openai/cache_embedding_model.py
 
 # Installing latest llamacpp python bindings
 RUN pip3 uninstall -y llama-cpp-python \
-    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.74 --no-cache-dir
+    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.77 --no-cache-dir
 
 # Making latest bitsandbytes with cuda support
 RUN pip3 uninstall -y bitsandbytes \
     && git clone https://github.com/TimDettmers/bitsandbytes.git --branch 0.41.0 \
     && cd bitsandbytes && CUDA_VERSION=118 make cuda11x \
     && python3 setup.py install
-
-# Make sure exllama is removed and include latest exllama with gqa support until next text-gen update
-RUN pip3 uninstall -y exllama
-RUN mkdir -p text-generation-webui/repositories/ && cd text-generation-webui/repositories/ \
-    && git clone https://github.com/turboderp/exllama && cd exllama && git checkout e8a544f95b3fd64dfa5549eeeafb85b1ac71a793
 
 RUN conda clean -afy
 

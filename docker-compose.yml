@@ -5,6 +5,7 @@ services:
     restart: always
     volumes:
       - '${MODEL_DIR}:/models'
+      - '${EXTENSIONS_DIR}:/extensions'
     ports:
       - '7860:7860'
       - '5000:5000'
