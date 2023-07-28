@@ -1,10 +1,10 @@
 # text-generation-webui-docker
 
-Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.3.1 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.3.1
+Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.5 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.5
 
-July 22: Includes an update to the exllama module for running GQA (aka 70B version of Llama 2)
+As of 1.5 I've added the ability to pass your own extensions! The start.sh script handles it, but basically it will parse all the extensions in your local extensions folder, install their requirements, and symlink them into the docker volume for extensions. This means that after you add extensions you will have to restart your image to pick up the new changes!
 
-You can pass folders for models, loras, prompts, presets, and characters
+You can also pass folders for models, loras, prompts, presets, and characters
 
 For all but loras, they will copy what is currently in master into your local folder, which means if you modify any of the presets or prompts, you should save them as a new file/name, or it will get overwritten next time you start (may look at fixing this if there's interest, open an issue)
 
