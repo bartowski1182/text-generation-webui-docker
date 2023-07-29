@@ -1,3 +1,7 @@
+## This work is not official
+
+I am providing this work as a helpful hand to people who are looking for a simple, easy to build docker image with GPU support, this is not official in any capacity, and any issues arising from this docker image should be posted here and not on their own repo or discord.
+
 # text-generation-webui-docker
 
 Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.5 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.5
