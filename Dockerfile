@@ -2,7 +2,7 @@
 FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 as builder
 
 # Using conda to transfer python env from builder to runtime later
-COPY --from=continuumio/miniconda3:4.12.0 /opt/conda /opt/conda
+COPY --from=continuumio/miniconda3:23.5.2-0 /opt/conda /opt/conda
 ENV PATH=/opt/conda/bin:$PATH
 
 # Update base image
@@ -15,13 +15,15 @@ RUN apt-get update && apt-get upgrade -y \
 RUN conda create -y -n textgen python=3.10.9
 SHELL ["conda", "run", "-n", "textgen", "/bin/bash", "-c"]
 
+ENV CUDA_DOCKER_ARCH=all
+
 # Installing torch and ninja
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 RUN pip3 install ninja
 
 # Pulling latest text-generation-webui branch
-RUN git clone https://github.com/oobabooga/text-generation-webui.git --branch v1.5 \
+RUN git clone https://github.com/oobabooga/text-generation-webui.git  \
     && cd text-generation-webui && pip3 install -r requirements.txt
 
 # Install all the extension requirements
@@ -36,8 +38,9 @@ RUN pip3 uninstall -y llama-cpp-python \
 
 # Making latest bitsandbytes with cuda support
 RUN pip3 uninstall -y bitsandbytes \
-    && git clone https://github.com/TimDettmers/bitsandbytes.git --branch 0.41.0 \
-    && cd bitsandbytes && CUDA_VERSION=118 make cuda11x \
+    && git clone https://github.com/TimDettmers/bitsandbytes.git \
+    && cd bitsandbytes && git checkout 18e827d666fa2b70a12d539ccedc17aa51b2c97c \
+    && CUDA_VERSION=118 make cuda11x \
     && python3 setup.py install
 
 RUN conda clean -afy
@@ -48,7 +51,6 @@ FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
 # Copy conda and cuda files over
 COPY --from=builder /opt/conda /opt/conda
 COPY --from=builder /usr/local/cuda-11.8/targets/x86_64-linux/include /usr/local/cuda-11.8/targets/x86_64-linux/include 
-COPY --from=builder /etc/OpenCL/vendors/nvidia.icd /etc/OpenCL/vendors/nvidia.icd
 
 ENV PATH=/opt/conda/bin:$PATH
 
@@ -57,16 +59,19 @@ COPY --from=builder /text-generation-webui /text-generation-webui
 
 # Setting frontend to noninteractive to avoid getting locked on keyboard input
 ENV DEBIAN_FRONTEND=noninteractive
+ENV CUDA_DOCKER_ARCH=all
 
 # Installing all the packages we need and updating cuda-keyring
 RUN apt-get -y update && apt-get -y install wget && wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb \
     && dpkg -i cuda-keyring_1.0-1_all.deb && apt-get update && apt-get upgrade -y \
     && apt-get -y install python3 build-essential \
-    && mkdir -p /etc/OpenCL/vendors \
     && apt-get -y install cuda-11.8 && apt-get -y install cuda-11.8 \
     && systemctl enable nvidia-persistenced \
     && cp /lib/udev/rules.d/40-vm-hotadd.rules /etc/udev/rules.d \
-    && sed -i '/SUBSYSTEM=="memory", ACTION=="add"/d' /etc/udev/rules.d/40-vm-hotadd.rules \
+    && sed -i '/SUBSYSTEM=="memory", ACTION=="add"/d' /etc/udev/rules.d/40-vm-hotadd.rules
+
+RUN apt-get update && apt-get remove --purge -y nvidia-* \
+    && apt-get install -y --allow-downgrades nvidia-driver-535/jammy-updates \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Set the working directory
