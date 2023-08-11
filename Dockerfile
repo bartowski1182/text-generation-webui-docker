@@ -24,7 +24,8 @@ RUN pip3 install ninja
 
 # Pulling latest text-generation-webui branch
 RUN git clone https://github.com/oobabooga/text-generation-webui.git  \
-    && cd text-generation-webui && pip3 install -r requirements.txt
+    && cd text-generation-webui && git checkout 8dbaa20ca8104aa5ead76dec13af3faa25f5d7e8 \
+    && pip3 install -r requirements.txt
 
 # Install all the extension requirements
 RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do pip3 install -r $i ; done'
@@ -62,6 +63,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV CUDA_DOCKER_ARCH=all
 
 # Installing all the packages we need and updating cuda-keyring
+# Some of this may be redundant, if you see something say something
 RUN apt-get -y update && apt-get -y install wget && wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb \
     && dpkg -i cuda-keyring_1.0-1_all.deb && apt-get update && apt-get upgrade -y \
     && apt-get -y install python3 build-essential \
@@ -81,6 +83,7 @@ EXPOSE 7860
 EXPOSE 5000
 
 # start.sh sets up the various available directories like models and characters
+# installs requirements for any user-included extensions
 # Also provides a conda env activated entrypoint
 COPY start.sh /start.sh
 RUN chmod +x /start.sh

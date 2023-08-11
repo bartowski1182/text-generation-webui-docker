@@ -8,6 +8,8 @@ Requires nvidia-driver 535.86.05, installed with apt-get install -y --allow-down
 
 Docker images and configuration to run text-generation-webui with GPU, currently updated to release v1.5 found here: https://github.com/oobabooga/text-generation-webui/releases/tag/v1.5
 
+1.5-8dbaa20: Starting to base off of commits as releases have slowed and there's lots of good new features to pull! So switching to this tagging system to keep track of specific images.
+
 As of 1.5 I've added the ability to pass your own extensions! The start.sh script handles it, but basically it will parse all the extensions in your local extensions folder, install their requirements, and symlink them into the docker volume for extensions. This means that after you add extensions you will have to restart your image to pick up the new changes!
 
 You can also pass folders for models, loras, prompts, presets, and characters
