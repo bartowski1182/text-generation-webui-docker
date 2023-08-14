@@ -24,7 +24,7 @@ RUN pip3 install ninja
 
 # Pulling latest text-generation-webui branch
 RUN git clone https://github.com/oobabooga/text-generation-webui.git  \
-    && cd text-generation-webui && git checkout 0e05818266570454c16d7c45b656338c99f22c46 \
+    && cd text-generation-webui && git checkout a95e6f02cbcc88756777c2affa8b621c7fbbb525 \
     && pip3 install -r requirements.txt
 
 # Install all the extension requirements
