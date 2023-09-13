@@ -7,6 +7,7 @@ services:
       - '${MODEL_DIR}:/models'
       - '${EXTENSIONS_DIR}:/extensions'
       - '${CHARACTERS_DIR}:/characters'
+      - '${SETTINGS_DIR}:/settings'
     ports:
       - '7860:7860'
       - '5000:5000'
@@ -28,7 +29,6 @@ services:
         "${MODEL}",
         "--loader",
         "exllama_hf",
-        "--chat",
         "--listen",
         "--listen-port",
         "7860",
@@ -37,6 +37,7 @@ services:
         "5000",
         "--extensions",
         "openai",
-        "telegram_bot",
-        "--verbose"
+        "--verbose",
+        "--settings",
+        "/settings/settings.yaml"
       ]

@@ -24,7 +24,7 @@ RUN pip3 install ninja
 
 # Pulling latest text-generation-webui branch
 RUN git clone https://github.com/oobabooga/text-generation-webui.git  \
-    && cd text-generation-webui && git checkout a95e6f02cbcc88756777c2affa8b621c7fbbb525 \
+    && cd text-generation-webui && git checkout b7adf290fc73531ab9ca9d995d2086886d5027a3 \
     && pip3 install -r requirements.txt
 
 # Install all the extension requirements
@@ -32,17 +32,6 @@ RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do p
 
 # Prepare cache for faster first time runs
 RUN python3 text-generation-webui/extensions/openai/cache_embedding_model.py
-
-# Installing latest llamacpp python bindings
-RUN pip3 uninstall -y llama-cpp-python \
-    && CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip3 install llama-cpp-python==0.1.77 --no-cache-dir
-
-# Making latest bitsandbytes with cuda support
-RUN pip3 uninstall -y bitsandbytes \
-    && git clone https://github.com/TimDettmers/bitsandbytes.git \
-    && cd bitsandbytes && git checkout 18e827d666fa2b70a12d539ccedc17aa51b2c97c \
-    && CUDA_VERSION=118 make cuda11x \
-    && python3 setup.py install
 
 RUN conda clean -afy
 
