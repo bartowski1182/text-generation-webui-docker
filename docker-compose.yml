@@ -16,12 +16,15 @@ services:
     ulimits:
       memlock: -1
     mem_limit: 50gb
+    shm_size: '4gb'
+    stdin_open: true
+    tty: true
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              device_ids: [ "0" ]
               capabilities: [ gpu ]
     command:
       [

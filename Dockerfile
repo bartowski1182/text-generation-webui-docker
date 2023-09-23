@@ -20,23 +20,27 @@ ENV CUDA_DOCKER_ARCH=all
 # Installing torch and ninja
 RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-RUN pip3 install ninja
+RUN pip3 install ninja packaging
+
+RUN MAX_JOBS=4 pip3 install flash-attn --no-build-isolation 
+
+ARG commithash=.
 
 # Pulling latest text-generation-webui branch
 RUN git clone https://github.com/oobabooga/text-generation-webui.git  \
-    && cd text-generation-webui && git checkout b7adf290fc73531ab9ca9d995d2086886d5027a3 \
+    && cd text-generation-webui && git checkout $commit \
     && pip3 install -r requirements.txt
 
 # Install all the extension requirements
 RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do pip3 install -r $i ; done'
 
 # Prepare cache for faster first time runs
-RUN python3 text-generation-webui/extensions/openai/cache_embedding_model.py
+#RUN cd /text-generation-webui/extensions/openai/ && python3 cache_embedding_model.py
 
 RUN conda clean -afy
 
-# Using runtime for smaller final image
-FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+# Using fully set up runtime for smaller final image with proper drivers
+FROM noneabove1182/nvidia-runtime-docker:11.8.0-runtime-ubuntu22.04
 
 # Copy conda and cuda files over
 COPY --from=builder /opt/conda /opt/conda
@@ -48,22 +52,7 @@ ENV PATH=/opt/conda/bin:$PATH
 COPY --from=builder /text-generation-webui /text-generation-webui
 
 # Setting frontend to noninteractive to avoid getting locked on keyboard input
-ENV DEBIAN_FRONTEND=noninteractive
 ENV CUDA_DOCKER_ARCH=all
-
-# Installing all the packages we need and updating cuda-keyring
-# Some of this may be redundant, if you see something say something
-RUN apt-get -y update && apt-get -y install wget && wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.0-1_all.deb \
-    && dpkg -i cuda-keyring_1.0-1_all.deb && apt-get update && apt-get upgrade -y \
-    && apt-get -y install python3 build-essential \
-    && apt-get -y install cuda-11.8 && apt-get -y install cuda-11.8 \
-    && systemctl enable nvidia-persistenced \
-    && cp /lib/udev/rules.d/40-vm-hotadd.rules /etc/udev/rules.d \
-    && sed -i '/SUBSYSTEM=="memory", ACTION=="add"/d' /etc/udev/rules.d/40-vm-hotadd.rules
-
-RUN apt-get update && apt-get remove --purge -y nvidia-* \
-    && apt-get install -y --allow-downgrades nvidia-driver-535/jammy-updates \
-    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Set the working directory
 WORKDIR /text-generation-webui
