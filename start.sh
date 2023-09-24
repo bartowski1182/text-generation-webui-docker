@@ -23,7 +23,7 @@ if [[ -d /prompts ]] ; then
     echo "Found prompts, copying repo prompts to local and linking the directory"
     cp -R /text-generation-webui/prompts/. /prompts
     rm -r /text-generation-webui/prompts
-    ln -s /prompts /text-generation-webui/loras
+    ln -s /prompts /text-generation-webui/prompts
 else
     echo "No prompts DIR"
 fi
@@ -32,7 +32,7 @@ if [[ -d /presets ]] ; then
     echo "Found presets, copying repo presets to local and linking the directory"
     cp -R /text-generation-webui/presets/. /presets
     rm -r /text-generation-webui/presets
-    ln -s /presets /text-generation-webui/loras
+    ln -s /presets /text-generation-webui/presets
 else
     echo "No presets DIR"
 fi
