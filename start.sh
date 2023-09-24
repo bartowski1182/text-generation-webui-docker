@@ -57,5 +57,12 @@ else
     echo "No extensions DIR"
 fi
 
+if [[ -d /logs ]] ; then
+    echo "Found logs, linking to logs folder in repo to save between sessions"
+    ln -s /logs /text-generation-webui/logs
+else
+    echo "No logs DIR"
+fi
+
 # Start the server
 conda run --no-capture-output -n textgen python server.py "$@"
