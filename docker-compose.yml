@@ -2,18 +2,22 @@ version: '3.9'
 services:
   text-generation-webui:
     container_name: text-generation-webui
-    restart: always
+    restart: unless-stopped
     volumes:
       - '${MODEL_DIR}:/models'
       - '${EXTENSIONS_DIR}:/extensions'
       - '${CHARACTERS_DIR}:/characters'
       - '${SETTINGS_DIR}:/settings'
       - '${LOGS_DIR}:/logs'
+      - '${LORAS_DIR}:/loras'
+      - '${DATASETS_DIR}:/datasets'
     ports:
       - '7860:7860'
       - '5000:5000'
       - '5001:5001'
     image: 'noneabove1182/text-gen-ui-gpu:latest'
+    environment:
+      - OPENEDAI_EMBEDDING_DEVICE=cuda
     ulimits:
       memlock: -1
     mem_limit: 50gb
@@ -25,14 +29,12 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: [ "0" ]
+              count: 1
               capabilities: [ gpu ]
     command:
       [
         "--model",
         "${MODEL}",
-        "--loader",
-        "exllama_hf",
         "--listen",
         "--listen-port",
         "7860",

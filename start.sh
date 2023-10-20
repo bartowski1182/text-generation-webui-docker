@@ -19,6 +19,15 @@ else
     echo "No loras DIR"
 fi
 
+if [[ -d /datasets ]] ; then
+    echo "Found datasets, linking the directory"
+    rm -r /text-generation-webui/training/datasets
+    ln -s /datasets /text-generation-webui/training/datasets
+else
+    echo "No datasets DIR"
+fi
+
+
 if [[ -d /prompts ]] ; then
     echo "Found prompts, copying repo prompts to local and linking the directory"
     cp -R /text-generation-webui/prompts/. /prompts
