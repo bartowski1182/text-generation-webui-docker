@@ -1,5 +1,5 @@
 # cuda devel image for base, best build compatibility
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 as builder
+FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 as builder
 
 # Using conda to transfer python env from builder to runtime later
 COPY --from=continuumio/miniconda3:23.5.2-0 /opt/conda /opt/conda
@@ -18,7 +18,7 @@ SHELL ["conda", "run", "-n", "textgen", "/bin/bash", "-c"]
 ENV CUDA_DOCKER_ARCH=all
 
 # Installing torch and ninja
-RUN pip3 install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+RUN pip3 install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 
 RUN pip3 install ninja packaging
 
@@ -38,11 +38,11 @@ RUN cd /text-generation-webui/extensions/openai/ && python3 cache_embedding_mode
 RUN conda clean -afy
 
 # Using fully set up runtime for smaller final image with proper drivers
-FROM noneabove1182/nvidia-runtime-docker:11.8.0-runtime-ubuntu22.04
+FROM noneabove1182/nvidia-runtime-docker:12.1.0-runtime-ubuntu22.04
 
 # Copy conda and cuda files over
 COPY --from=builder /opt/conda /opt/conda
-COPY --from=builder /usr/local/cuda-11.8/targets/x86_64-linux/include /usr/local/cuda-11.8/targets/x86_64-linux/include 
+COPY --from=builder /usr/local/cuda-12.1/targets/x86_64-linux/include /usr/local/cuda-12.1/targets/x86_64-linux/include 
 
 ENV PATH=/opt/conda/bin:$PATH
 

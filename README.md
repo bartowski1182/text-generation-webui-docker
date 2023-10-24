@@ -2,13 +2,17 @@
 
 I am providing this work as a helpful hand to people who are looking for a simple, easy to build docker image with GPU support, this is not official in any capacity, and any issues arising from this docker image should be posted here and not on their own repo or discord.
 
-Requires nvidia-driver 535.86.05, installed with apt-get install -y --allow-downgrades nvidia-driver-535/jammy-updates
+BREAKING CHANGE:
+
+As of 2023-10-24 the CUDA version is now 12.1 to support the change from Oobabooga being updated to 12.1. As such, the base images have been updated as has my nvidia-runtime-docker-for-llms image.
+
+Requires nvidia-driver 535.113.01, installed with apt-get install -y --allow-downgrades nvidia-driver-535/jammy-updates
 
 # text-generation-webui-docker
 
 Docker images and configuration to run text-generation-webui with GPU, currently being based off of latest commit whenever I feel like updating it, but the goal of this is to allow you to create it yourself with a clear concise Dockerfile that's understandable and transparent.
 
-I am using noneabove1182/nvidia-runtime-docker:11.8.0-runtime-ubuntu22.04 for my final build stage to speed up subsequent builds, since it always starts with a long process that isn't ACTUALLY affected by previous build stage being changed, but docker build doesn't know that.
+I am using noneabove1182/nvidia-runtime-docker:12.1.0-runtime-ubuntu22.04 for my final build stage to speed up subsequent builds, since it always starts with a long process that isn't ACTUALLY affected by previous build stage being changed, but docker build doesn't know that.
 
 Here's a link to what that container is built from:
 https://github.com/noneabove1182/nvidia-runtime-docker-for-llms
