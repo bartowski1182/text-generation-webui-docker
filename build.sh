@@ -1,21 +1,9 @@
 #!/bin/bash
 
-# Load variables from .env file
-if [ -f .env ]; then
-    source .env
-else
-    echo ".env file not found!"
-    exit 1
-fi
+REPO_URL="https://api.github.com/repos/oobabooga/text-generation-webui/commits/master"
 
-# Use the variable from .env if no argument is passed
-if [ "$#" -eq 0 ]; then
-    if [ -z "$COMMITHASH" ]; then
-        echo "No commit hash provided and none found in .env"
-        exit 1
-    fi
-else
-    COMMITHASH=$1
-fi
+LATEST_COMMIT=$(curl -s $REPO_URL | grep 'sha' | cut -d\" -f4 | head -n 1)
 
-docker build --build-arg commithash=$COMMITHASH -t noneabove1182/text-gen-ui-gpu .
+echo $LATEST_COMMIT
+
+docker build --build-arg commit_hash="$LATEST_COMMIT" -t noneabove1182/text-gen-ui-gpu .
