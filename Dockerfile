@@ -40,7 +40,7 @@ RUN cd /text-generation-webui/extensions/openai/ && python3 cache_embedding_mode
 RUN conda clean -afy
 
 # Using fully set up runtime for smaller final image with proper drivers
-FROM noneabove1182/nvidia-runtime-docker:12.1.1-runtime-ubuntu22.04
+FROM noneabove1182/nvidia-runtime-docker:12.1.1-runtime-ubuntu22.04-535.129
 
 # Copy conda and cuda files over
 COPY --from=builder /opt/conda /opt/conda
