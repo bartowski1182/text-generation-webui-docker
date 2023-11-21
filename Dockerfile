@@ -18,12 +18,13 @@ SHELL ["conda", "run", "-n", "textgen", "/bin/bash", "-c"]
 ENV CUDA_DOCKER_ARCH=all
 
 # Installing torch and ninja
-RUN pip3 install torch==2.1.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install torch==2.1.0 torchvision torchaudio xformers --index-url https://download.pytorch.org/whl/cu121
 
-RUN pip3 install ninja packaging
+RUN pip3 install ninja packaging sentence-transformers
 
 ARG clone_arg
 ARG commit
+ARG CACHEBUST=1
 
 # Pulling latest text-generation-webui branch
 RUN git clone https://github.com/oobabooga/text-generation-webui.git $clone_arg \
@@ -34,8 +35,8 @@ RUN git clone https://github.com/oobabooga/text-generation-webui.git $clone_arg 
 # Install all the extension requirements
 RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do pip3 install -r $i ; done'
 
-# Prepare cache for faster first time runs
-RUN cd /text-generation-webui/extensions/openai/ && python3 cache_embedding_model.py
+# Prepare cache for faster first time runs -- removed until its fixed
+#RUN cd /text-generation-webui/extensions/openai/ && python3 cache_embedding_model.py
 
 RUN conda clean -afy
 

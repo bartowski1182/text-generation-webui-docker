@@ -11,10 +11,10 @@ services:
       - '${LOGS_DIR}:/logs'
       - '${LORAS_DIR}:/loras'
       - '${DATASETS_DIR}:/datasets'
+      - '${PRESETS_DIR}:/presets'
     ports:
       - '7860:7860'
       - '5000:5000'
-      - '5001:5001'
     image: 'noneabove1182/text-gen-ui-gpu:latest'
     environment:
       - OPENEDAI_EMBEDDING_DEVICE=cuda
@@ -38,11 +38,9 @@ services:
         "--listen",
         "--listen-port",
         "7860",
+        "--listen-host",
+        "0.0.0.0",
         "--api",
-        "--api-blocking-port",
-        "5000",
-        "--extensions",
-        "openai",
         "--verbose",
         "--settings",
         "/settings/settings.yaml"

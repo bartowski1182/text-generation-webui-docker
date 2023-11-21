@@ -12,7 +12,7 @@ Known working with nvidia driver 535.129, may work on other versions
 
 # text-generation-webui-docker
 
-Docker images and configuration to run text-generation-webui with GPU, currently being based off of latest commit whenever I feel like updating it, but the goal of this is to allow you to create it yourself with a clear concise Dockerfile that's understandable and transparent.
+Docker images and configuration to run [text-generation-webui](https://github.com/oobabooga/text-generation-webui/) with GPU, currently being based off of latest commit whenever I feel like updating it, but the goal of this is to allow you to create it yourself with a clear concise Dockerfile that's understandable and transparent.
 
 I am using noneabove1182/nvidia-runtime-docker:12.1.1-runtime-ubuntu22.04-535.129 for my final build stage to speed up subsequent builds, since it always starts with a long process that isn't ACTUALLY affected by previous build stage being changed, but docker build doesn't know that. It's simply taking the nvidia/cuda:12.1.1-runtime-ubuntu22.04 and updating packages and setting up proper driver versions such as 535.129
 

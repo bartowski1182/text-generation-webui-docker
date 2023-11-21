@@ -1,1 +1,4 @@
 logs
+docker_build.log
+nohup.out
+presets/
