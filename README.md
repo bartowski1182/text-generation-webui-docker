@@ -2,6 +2,8 @@
 
 I am providing this work as a helpful hand to people who are looking for a simple, easy to build docker image with GPU support, this is not official in any capacity, and any issues arising from this docker image should be posted here and not on their own repo or discord.
 
+Instructions for getting nvidia docker set up: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+
 BREAKING CHANGE:
 
 As of 2023-10-24 the CUDA version is now 12.1 to support the change from Oobabooga being updated to 12.1. As such, the base images have been updated as has my nvidia-runtime-docker-for-llms image.
