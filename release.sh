@@ -17,7 +17,7 @@ echo $RELEASE_TAG
 CLONE_ARG="--branch $RELEASE_TAG"
 
 # Build the Docker image
-docker build --build-arg clone_arg="$CLONE_ARG" -t noneabove1182/text-gen-ui-gpu .
+docker build --build-arg CACHEBUST=$(date +%s) --build-arg clone_arg="$CLONE_ARG" -t noneabove1182/text-gen-ui-gpu .
 
 # Check if Docker build was successful
 if [ $? -ne 0 ]; then

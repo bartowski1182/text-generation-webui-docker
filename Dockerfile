@@ -18,7 +18,7 @@ SHELL ["conda", "run", "-n", "textgen", "/bin/bash", "-c"]
 ENV CUDA_DOCKER_ARCH=all
 
 # Installing torch and ninja
-RUN pip3 install torch==2.1.0 torchvision torchaudio xformers --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install torch torchvision torchaudio xformers --index-url https://download.pytorch.org/whl/cu121
 
 RUN pip3 install ninja packaging sentence-transformers
 
@@ -27,7 +27,7 @@ ARG commit
 ARG CACHEBUST=1
 
 # Pulling latest text-generation-webui branch
-RUN git clone https://github.com/oobabooga/text-generation-webui.git $clone_arg \
+RUN git clone https://github.com/oobabooga/text-generation-webui/ $clone_arg \
     && cd text-generation-webui \
     && if [ -n "$commit" ]; then git checkout $commit; fi \
     && pip3 install -r requirements.txt
