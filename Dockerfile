@@ -40,19 +40,17 @@ RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do p
 
 RUN conda clean -afy
 
-# Using fully set up runtime for smaller final image with proper drivers
-FROM noneabove1182/nvidia-runtime-docker:12.1.1-runtime-ubuntu22.04-535.129
+# Using ubuntu 22.04 for runtime
+FROM ubuntu:22.04
 
-# Copy conda and cuda files over
+# Copy conda over
 COPY --from=builder /opt/conda /opt/conda
-COPY --from=builder /usr/local/cuda-12.1/targets/x86_64-linux/include /usr/local/cuda-12.1/targets/x86_64-linux/include 
-
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 ENV PATH=/opt/conda/bin:$PATH
 
 # Copy git repo from builder
 COPY --from=builder /text-generation-webui /text-generation-webui
 
-# Setting frontend to noninteractive to avoid getting locked on keyboard input
 ENV CUDA_DOCKER_ARCH=all
 
 # Set the working directory

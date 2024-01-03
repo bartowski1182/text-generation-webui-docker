@@ -12,6 +12,7 @@ services:
       - '${LORAS_DIR}:/loras'
       - '${DATASETS_DIR}:/datasets'
       - '${PRESETS_DIR}:/presets'
+      - '${PROMPTS_DIR}:/prompts'
     ports:
       - '7860:7860'
       - '5000:5000'
