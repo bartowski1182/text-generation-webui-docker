@@ -18,6 +18,8 @@ services:
       - '5000:5000'
     image: 'noneabove1182/text-gen-ui-gpu:latest'
     environment:
+      - PUID=1000
+      - PGID=1000
       - OPENEDAI_EMBEDDING_DEVICE=cuda
     ulimits:
       memlock: -1
@@ -30,7 +32,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              device_ids: [ '1', '0' ]
               capabilities: [ gpu ]
     command:
       [

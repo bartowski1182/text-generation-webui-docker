@@ -32,7 +32,7 @@ Next, build the image. This will use the latest from the text-generation-webui r
 
 ```sh
 cd text-generation-webui-docker
-docker build -t text-generation-webui-docker:latest .
+docker build -t text-gen-ui-gpu:latest .
 ```
 
 Alternatively you can run the build script, which will also just pull latest unless you have a COMMITHASH variable in a .env file or specify a commit while running the script like below:
@@ -42,12 +42,10 @@ cd text-generation-webui-docker
 ./build.sh 7a3ca2c68f1ca49ac4e4b62f016718556fd3805c
 ```
 
-(note it will call it noneabove1182/text-generation-webui-docker since that's what I use, and tag it as well, may change this later)
-
 # Running the image with docker run
 
 ```sh
-docker run --gpus all -p 7860:7860 -v /media/teamgroup/models:/models -v ./logs:/logs text-generation-webui-docker:latest --model WizardLM-13B-V1.1-GPTQ --chat --listen --listen-port 7860
+docker run --gpus all -p 7860:7860 -v /media/teamgroup/models:/models -v ./logs:/logs text-gen-ui-gpu:latest --model WizardLM-13B-V1.1-GPTQ --chat --listen --listen-port 7860
 ```
 
 # Running the image with docker compose

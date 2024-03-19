@@ -3,3 +3,9 @@ docker_build.log
 nohup.out
 presets/
 prompts/
+characters/
+settings/
+datasets/
+loras/
+dev_build.sd
+release.sh

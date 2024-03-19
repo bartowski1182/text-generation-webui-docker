@@ -2,7 +2,7 @@
 FROM nvidia/cuda:12.1.1-devel-ubuntu22.04 as builder
 
 # Using conda to transfer python env from builder to runtime later
-COPY --from=continuumio/miniconda3:23.5.2-0 /opt/conda /opt/conda
+COPY --from=continuumio/miniconda3:23.10.0-1 /opt/conda /opt/conda
 ENV PATH=/opt/conda/bin:$PATH
 
 # Update base image
@@ -12,31 +12,29 @@ RUN apt-get update && apt-get upgrade -y \
     && mkdir -p /etc/OpenCL/vendors && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
 
 # Create new conda environment
-RUN conda create -y -n textgen python=3.11.5
+RUN conda create -y -n textgen python=3.11.8
 SHELL ["conda", "run", "-n", "textgen", "/bin/bash", "-c"]
 
 ENV CUDA_DOCKER_ARCH=all
 
+ARG CACHEBUST=1
+
 # Installing torch and ninja
-RUN pip3 install torch torchvision torchaudio xformers --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install torch==2.2.* torchvision==0.17.* torchaudio==2.2.* xformers --index-url https://download.pytorch.org/whl/cu121
 
 RUN pip3 install ninja packaging sentence-transformers
 
 ARG clone_arg
 ARG commit
-ARG CACHEBUST=1
 
 # Pulling latest text-generation-webui branch
 RUN git clone https://github.com/oobabooga/text-generation-webui/ $clone_arg \
     && cd text-generation-webui \
     && if [ -n "$commit" ]; then git checkout $commit; fi \
-    && pip3 install -r requirements.txt
+    && pip3 install -r requirements.txt --upgrade
 
 # Install all the extension requirements
 RUN bash -c 'for i in text-generation-webui/extensions/*/requirements.txt ; do pip3 install -r $i ; done'
-
-# Prepare cache for faster first time runs -- removed until its fixed
-#RUN cd /text-generation-webui/extensions/openai/ && python3 cache_embedding_model.py
 
 RUN conda clean -afy
 
